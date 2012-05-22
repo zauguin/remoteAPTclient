@@ -48,8 +48,7 @@
 using std::istream;
 using std::cin;
 using std::endl;
-using std::ofstream;
-using std::ifstream;
+using std::fstream;
 using std::set;
 using std::string;
 using std::getline;
@@ -87,16 +86,16 @@ void execCommand(string executable, std::vector<string> firstArgs, std::vector<s
 
 int main(int argc, char **argv)
 {
-  ifstream old_file_r("installed");
-  auto old_set=streamToSet(old_file_r);
-  old_file_r.close();
-  ofstream old_file_w("installed", std::ios::trunc);
-  auto new_set=streamToSet(cin, [&old_file_w](string name){old_file_w << name << endl;});
+  fstream old_file("installed", std::ios_base::in);
+  auto old_set=streamToSet(old_file);
+  old_file.close();
+  old_file.open("installed", std::ios_base::out|std::ios_base::trunc);
+  auto new_set=streamToSet(cin, [&old_file](string name){old_file << name << endl;});
   for(auto i:old_set) {
     if(new_set.erase(i))
       old_set.erase(i);
   }
-  old_file_w.close();
+  old_file.close();
   std::vector<string> new_vector, old_vector;
   std::copy(new_set.begin(), new_set.end(), std::back_insert_iterator<std::vector<string>>(new_vector));
   std::copy(old_set.begin(), old_set.end(), std::back_insert_iterator<std::vector<string>>(old_vector));
