@@ -100,9 +100,12 @@ int main(int argc, char **argv)
   old_file.close();
   old_file.open("installed", std::ios_base::out|std::ios_base::trunc);
   auto new_set=streamToSet(cin, [&old_file](string name){old_file << name << endl;});
-  for(auto i:old_set) {
-    if(new_set.erase(i))
-      old_set.erase(i);
+  {
+    auto old_set2 = old_set;
+    for(auto i:old_set2) {
+      if(new_set.erase(i))
+        old_set.erase(i);
+    }
   }
   old_file.close();
   std::vector<string> new_vector, old_vector;
