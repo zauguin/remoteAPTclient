@@ -54,6 +54,18 @@ using std::string;
 using std::getline;
 using std::function;
 
+string join(const std::vector<string> &array, char seperator) {
+  if(array.size()) {
+    string result = array[0];
+    for(auto i = array.begin()+1;i!=array.end();++i) {
+      result += seperator + *i;
+    }
+    return result;
+  } else {
+    return string("");
+  }
+}
+
 unordered_set<string> streamToSet(istream &stream, function<void(string)> helper = [](string){}) {
   unordered_set<string> result;
   string package_name;
@@ -74,10 +86,7 @@ void execCommand(string executable, std::vector<string> firstArgs, std::vector<s
     char **args = new char*[string_args.size()];
     auto first = string_args.begin();
     while (first != string_args.end()) *args++ = (char *)(*first++).c_str();
-    //
-    for(auto arg : string_args)
-      std::cout << ' ' << arg;
-    std::cout << endl;
+    std::cout << join(string_args, ' ') << endl;
     std::exit(0);
     //
     //execvp(executable.c_str(), args);
