@@ -1,5 +1,5 @@
 /*
- * main.cxx
+ * remoteAPTclient.cxx
  *
  * Copyright 2012 Marcel Krüger <zauguin@gmail.com>
  *
