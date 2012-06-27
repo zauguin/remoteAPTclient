@@ -13,7 +13,7 @@
  *   copyright notice, this list of conditions and the following disclaimer
  *   in the documentation and/or other materials provided with the
  *   distribution.
- * * Neither the name of the Open G500 Project nor the names of its
+ * * Neither the name of the Remote Package Management Project nor the names of its
  *   contributors may be used to endorse or promote products derived from
  *   this software without specific prior written permission.
  *
@@ -35,7 +35,7 @@
 
 #include <iostream>
 #include <fstream>
-#include <set>
+#include <unordered_set>
 #include <string>
 #include <functional>
 #include <algorithm>
@@ -49,13 +49,13 @@ using std::istream;
 using std::cin;
 using std::endl;
 using std::fstream;
-using std::set;
+using std::unordered_set;
 using std::string;
 using std::getline;
 using std::function;
 
-set<string> streamToSet(istream &stream, function<void(string)> helper = [](string){}) {
-  set<string> result;
+unordered_set<string> streamToSet(istream &stream, function<void(string)> helper = [](string){}) {
+  unordered_set<string> result;
   string package_name;
   while(getline(stream, package_name)) {
     helper(package_name);
@@ -88,7 +88,6 @@ int main(int argc, char **argv)
 {
   fstream old_file("installed", std::ios_base::in);
   auto old_set=streamToSet(old_file);
-  old_file.close();
   old_file.open("installed", std::ios_base::out|std::ios_base::trunc);
   auto new_set=streamToSet(cin, [&old_file](string name){old_file << name << endl;});
   for(auto i:old_set) {
