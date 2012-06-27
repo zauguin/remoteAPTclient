@@ -88,6 +88,7 @@ int main(int argc, char **argv)
 {
   fstream old_file("installed", std::ios_base::in);
   auto old_set=streamToSet(old_file);
+  old_file.close();
   old_file.open("installed", std::ios_base::out|std::ios_base::trunc);
   auto new_set=streamToSet(cin, [&old_file](string name){old_file << name << endl;});
   for(auto i:old_set) {
