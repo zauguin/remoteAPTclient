@@ -71,7 +71,10 @@ unordered_set<string> streamToSet(istream &stream, function<void(string)> helper
   string package_name;
   while(getline(stream, package_name)) {
     helper(package_name);
-    result.insert(package_name);
+    if(package_name[0]=='-')
+      result.erase(package_name.substr(1));
+    else
+      result.insert(package_name);
   }
   return result;
 }
