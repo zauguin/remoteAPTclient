@@ -1,0 +1,4 @@
+#cmakedefine USE_INSTALLED_FILE
+#ifdef USE_INSTALLED_FILE
+#define WRITE_TO_INSTALLED_FILE
+#endif

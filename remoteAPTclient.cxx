@@ -34,7 +34,6 @@
 
 
 #include <iostream>
-#include <fstream>
 #include <unordered_set>
 #include <string>
 #include <functional>
@@ -44,11 +43,12 @@
 
 #include <unistd.h>
 #include <sys/wait.h>
+#include "installed.h"
 
 using std::istream;
 using std::cin;
 using std::endl;
-using std::fstream;
+using std::ostream;
 using std::unordered_set;
 using std::string;
 using std::getline;
@@ -98,11 +98,14 @@ void execCommand(string executable, std::vector<string> firstArgs, std::vector<s
 
 int main(int argc, char **argv)
 {
-  fstream old_file("installed", std::ios_base::in);
-  auto old_set=streamToSet(old_file);
-  old_file.close();
-  old_file.open("installed", std::ios_base::out|std::ios_base::trunc);
-  auto new_set=streamToSet(cin, [&old_file](string name){old_file << name << endl;});
+  istream &old_file_i = get_istream();
+  auto old_set=streamToSet(old_file_i);
+#ifdef WRITE_TO_INSTALLED_FILE
+  ostream &old_file_o = get_ostream();
+  auto new_set=streamToSet(cin, [&old_file_o](string name){old_file_o << name << endl;});
+#else
+  auto new_set=streamToSet(cin);
+#endif
   {
     auto old_set2 = old_set;
     for(auto i:old_set2) {
@@ -110,7 +113,6 @@ int main(int argc, char **argv)
         old_set.erase(i);
     }
   }
-  old_file.close();
   std::vector<string> new_vector, old_vector;
   std::copy(new_set.begin(), new_set.end(), std::back_insert_iterator<std::vector<string>>(new_vector));
   std::copy(old_set.begin(), old_set.end(), std::back_insert_iterator<std::vector<string>>(old_vector));
