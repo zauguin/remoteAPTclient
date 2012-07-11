@@ -41,8 +41,8 @@
 
 #include <cstdlib>
 
-#include <unistd.h>
-#include <sys/wait.h>
+#include <config.h>
+#include "packagemanager/common.h"
 #include "installed.h"
 
 using std::istream;
@@ -53,18 +53,6 @@ using std::unordered_set;
 using std::string;
 using std::getline;
 using std::function;
-
-string join(const std::vector<string> &array, char seperator) {
-  if(array.size()) {
-    string result = array[0];
-    for(auto i = array.begin()+1;i!=array.end();++i) {
-      result += seperator + *i;
-    }
-    return result;
-  } else {
-    return string("");
-  }
-}
 
 unordered_set<string> streamToSet(istream &stream, function<void(string)> helper = [](string){}) {
   unordered_set<string> result;
@@ -79,30 +67,15 @@ unordered_set<string> streamToSet(istream &stream, function<void(string)> helper
   return result;
 }
 
-void execCommand(string executable, std::vector<string> firstArgs, std::vector<string> argList) {
-  std::vector<string> string_args({executable});
-  std::copy(firstArgs.begin(), firstArgs.end(), std::back_insert_iterator<std::vector<string>>(string_args));
-  std::copy(argList.begin(), argList.end(), std::back_insert_iterator<std::vector<string>>(string_args));
-  if(pid_t pid = fork()) {
-    waitpid(pid, NULL, 0);
-  } else {
-    char **args = new char*[string_args.size()];
-    auto first = string_args.begin();
-    while (first != string_args.end()) *args++ = (char *)(*first++).c_str();
-    std::cout << join(string_args, ' ') << endl;
-    std::exit(0);
-    //
-    //execvp(executable.c_str(), args);
-  }
-}
-
 int main(int argc, char **argv)
 {
   istream &old_file_i = get_istream();
   auto old_set=streamToSet(old_file_i);
+  close_stream(old_file_i);
 #ifdef WRITE_TO_INSTALLED_FILE
   ostream &old_file_o = get_ostream();
   auto new_set=streamToSet(cin, [&old_file_o](string name){old_file_o << name << endl;});
+  close_stream(old_file_o);
 #else
   auto new_set=streamToSet(cin);
 #endif
@@ -116,15 +89,7 @@ int main(int argc, char **argv)
   std::vector<string> new_vector, old_vector;
   std::copy(new_set.begin(), new_set.end(), std::back_insert_iterator<std::vector<string>>(new_vector));
   std::copy(old_set.begin(), old_set.end(), std::back_insert_iterator<std::vector<string>>(old_vector));
-  execCommand("apt-get", {"update"}, {});
-  if(old_vector.size())
-    execCommand("apt-mark", {"markauto"}, old_vector);
-  if(new_vector.size()) {
-    execCommand("apt-get", {"install"}, new_vector);
-    execCommand("apt-mark", {"unmarkauto"}, new_vector);
-  }
-  execCommand("apt-get", {"dist_upgrade"}, {});
-  execCommand("apt-get", {"autoremove"}, {});
+  execute(new_vector, old_vector);
   return 0;
 }
 
