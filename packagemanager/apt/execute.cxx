@@ -1,4 +1,4 @@
-#include "common.h"
+#include "../common/execute.h"
 
 void execute(std::vector<std::string> install, std::vector<std::string> deinstall) {
   execCommand("apt-get", {"update"}, {});

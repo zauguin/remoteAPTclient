@@ -42,8 +42,8 @@
 #include <cstdlib>
 
 #include <config.h>
-#include "packagemanager/common.h"
-#include "installed.h"
+#include "packagemanager/common/execute.h"
+#include "packagemanager/common/installed.h"
 
 using std::istream;
 using std::cin;
