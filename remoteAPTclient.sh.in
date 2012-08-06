@@ -1,2 +1,3 @@
 #!/bin/sh
-wget -O - @HOST@:@PORT@|remoteAPTclient.bin
+cd $(dirname $(readlink -f $(which $0)));
+wget -O - @HOST@:@PORT@|./remoteAPTclient.bin
